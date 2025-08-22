@@ -135,6 +135,139 @@ button:active {
     text-transform: capitalize;
 }
 
+/* Birth Chart Styles */
+.birth-chart-container {
+    margin: 30px 0;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    backdrop-filter: blur(5px);
+}
+
+.birth-chart-container h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: white;
+    font-size: 1.3em;
+}
+
+.birth-chart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.chart-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 2px;
+    width: 100%;
+    max-width: 400px;
+    aspect-ratio: 1;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.house {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.house:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.house-number {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    background: #667eea;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7em;
+    font-weight: bold;
+}
+
+.house-sign {
+    font-size: 0.8em;
+    font-weight: 600;
+    color: #333;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.house-planets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    justify-content: center;
+    font-size: 1.2em;
+}
+
+.planet-symbol {
+    font-size: 1.1em;
+    margin: 0 1px;
+}
+
+/* Chart Legend */
+.chart-legend {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.chart-legend h4 {
+    text-align: center;
+    color: white;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
+
+.legend-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 10px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    font-size: 0.9em;
+}
+
+.legend-item .planet-symbol {
+    font-size: 1.3em;
+    background: rgba(255, 255, 255, 0.2);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Responsive Design for Birth Chart */
 @media (max-width: 480px) {
     .container {
         padding: 30px 20px;
@@ -148,5 +281,28 @@ button:active {
         flex-direction: column;
         align-items: flex-start;
         gap: 5px;
+    }
+    
+    .chart-grid {
+        max-width: 300px;
+        gap: 1px;
+        padding: 5px;
+    }
+    
+    .house {
+        min-height: 60px;
+        padding: 5px;
+    }
+    
+    .house-sign {
+        font-size: 0.7em;
+    }
+    
+    .house-planets {
+        font-size: 1em;
+    }
+    
+    .legend-items {
+        grid-template-columns: repeat(2, 1fr);
     }
 }

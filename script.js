@@ -18,6 +18,33 @@ const RASHIS = [
     'Dhanu (Sagittarius)', 'Makara (Capricorn)', 'Kumbha (Aquarius)', 'Meena (Pisces)'
 ];
 
+// Planetary symbols and names
+const PLANETS = {
+    'Sun': { symbol: '☉', name: 'Sun' },
+    'Moon': { symbol: '☽', name: 'Moon' },
+    'Mars': { symbol: '♂', name: 'Mars' },
+    'Mercury': { symbol: '☿', name: 'Mercury' },
+    'Jupiter': { symbol: '♃', name: 'Jupiter' },
+    'Venus': { symbol: '♀', name: 'Venus' },
+    'Saturn': { symbol: '♄', name: 'Saturn' }
+};
+
+// House names in Vedic astrology
+const HOUSE_NAMES = {
+    1: 'Lagna (Ascendant)',
+    2: 'Dhana (Wealth)',
+    3: 'Sahaja (Siblings)',
+    4: 'Sukha (Happiness)',
+    5: 'Putra (Children)',
+    6: 'Ari (Enemies)',
+    7: 'Kalatra (Spouse)',
+    8: 'Ayush (Longevity)',
+    9: 'Dharma (Religion)',
+    10: 'Karma (Career)',
+    11: 'Labha (Gains)',
+    12: 'Vyaya (Losses)'
+};
+
 const NAKSHATRA_RASHI_MAPPING = {
     'Ashwini': 'Mesha (Aries)', 'Bharani': 'Mesha (Aries)', 'Krittika': 'Mesha (Aries)',
     'Rohini': 'Vrishabha (Taurus)', 'Mrigashira': 'Vrishabha (Taurus)',
@@ -90,11 +117,19 @@ function calculateVedicChart(birthdate, birthtime, birthlocation) {
     // Calculate Ascendant (Lagna) - simplified
     const ascendant = calculateAscendant(date, birthlocation);
     
+    // Calculate planetary positions for birth chart
+    const planetaryPositions = calculatePlanetaryPositions(jdn);
+    
+    // Calculate house positions
+    const housePositions = calculateHousePositions(ascendant, planetaryPositions);
+    
     return {
         rashi: rashi,
         nakshatra: nakshatra,
         nakshatraPada: nakshatraPada,
-        ascendant: ascendant
+        ascendant: ascendant,
+        planetaryPositions: planetaryPositions,
+        housePositions: housePositions
     };
 }
 
@@ -184,6 +219,96 @@ function calculateAscendant(date, location) {
     return zodiacSigns[signIndex];
 }
 
+// Calculate planetary positions
+function calculatePlanetaryPositions(jdn) {
+    // Simplified planetary calculations
+    // In real Vedic astrology, you would use precise ephemeris data
+    
+    const positions = {};
+    const referenceJDN = 2451545.0;
+    const daysSinceReference = jdn - referenceJDN;
+    
+    // Simplified mean motion calculations
+    const meanMotions = {
+        'Sun': 0.9856,      // degrees per day
+        'Moon': 13.176,     // degrees per day
+        'Mars': 0.524,      // degrees per day
+        'Mercury': 1.383,   // degrees per day
+        'Jupiter': 0.083,   // degrees per day
+        'Venus': 1.2,       // degrees per day
+        'Saturn': 0.034     // degrees per day
+    };
+    
+    for (let planet in meanMotions) {
+        let longitude = (daysSinceReference * meanMotions[planet]) % 360;
+        if (longitude < 0) longitude += 360;
+        positions[planet] = longitude;
+    }
+    
+    return positions;
+}
+
+// Calculate house positions
+function calculateHousePositions(ascendant, planetaryPositions) {
+    // Get ascendant sign index
+    const zodiacSigns = [
+        'Mesha (Aries)', 'Vrishabha (Taurus)', 'Mithuna (Gemini)', 'Karka (Cancer)',
+        'Simha (Leo)', 'Kanya (Virgo)', 'Tula (Libra)', 'Vrishchika (Scorpio)',
+        'Dhanu (Sagittarius)', 'Makara (Capricorn)', 'Kumbha (Aquarius)', 'Meena (Pisces)'
+    ];
+    
+    const ascendantIndex = zodiacSigns.indexOf(ascendant);
+    
+    // Calculate house positions (simplified)
+    const houses = {};
+    for (let i = 1; i <= 12; i++) {
+        const houseSignIndex = (ascendantIndex + i - 1) % 12;
+        houses[i] = zodiacSigns[houseSignIndex];
+    }
+    
+    // Determine which planets are in which houses
+    const housePlanets = {};
+    for (let i = 1; i <= 12; i++) {
+        housePlanets[i] = [];
+    }
+    
+    for (let planet in planetaryPositions) {
+        const planetLongitude = planetaryPositions[planet];
+        const planetSignIndex = Math.floor(planetLongitude / 30);
+        const houseNumber = ((planetSignIndex - ascendantIndex + 12) % 12) + 1;
+        housePlanets[houseNumber].push(planet);
+    }
+    
+    return {
+        signs: houses,
+        planets: housePlanets
+    };
+}
+
+// Populate birth chart visualization
+function populateBirthChart(housePositions) {
+    // Populate house signs
+    for (let i = 1; i <= 12; i++) {
+        const signElement = document.getElementById(`house${i}-sign`);
+        const planetsElement = document.getElementById(`house${i}-planets`);
+        
+        if (signElement) {
+            signElement.textContent = housePositions.signs[i];
+        }
+        
+        if (planetsElement) {
+            planetsElement.innerHTML = '';
+            housePositions.planets[i].forEach(planet => {
+                const planetSymbol = document.createElement('span');
+                planetSymbol.className = 'planet-symbol';
+                planetSymbol.textContent = PLANETS[planet].symbol;
+                planetSymbol.title = `${PLANETS[planet].name} in ${housePositions.signs[i]}`;
+                planetsElement.appendChild(planetSymbol);
+            });
+        }
+    }
+}
+
 // Function to display Vedic results
 function displayVedicResults(chart) {
     // Update the result elements
@@ -191,6 +316,11 @@ function displayVedicResults(chart) {
     document.getElementById('nakshatra').textContent = chart.nakshatra;
     document.getElementById('nakshatraPada').textContent = chart.nakshatraPada;
     document.getElementById('ascendant').textContent = chart.ascendant;
+    
+    // Populate the birth chart visualization
+    if (chart.housePositions) {
+        populateBirthChart(chart.housePositions);
+    }
     
     // Show the results section
     resultsDiv.classList.remove('hidden');
@@ -200,4 +330,6 @@ function displayVedicResults(chart) {
     
     // Log detailed information
     console.log('Vedic Chart Results:', chart);
+    console.log('House Positions:', chart.housePositions);
+    console.log('Planetary Positions:', chart.planetaryPositions);
 }
